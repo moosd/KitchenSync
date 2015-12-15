@@ -1,0 +1,12 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="kitchensend:jar">
+    <output-path>$PROJECT_DIR$/</output-path>
+    <root id="archive" name="kitchensend.jar">
+      <element id="module-output" name="KitchenSyncD_mk2_desktop" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/libs/jnotify-0.94.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/../KitchenSync-common/kitchensync-common.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/../KitchenSync-common/libs/commons-codec-1.9.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/../KitchenSync-common/libs/commons-lang3-3.3.1.jar" path-in-jar="/" />
+    </root>
+  </artifact>
+</component>
