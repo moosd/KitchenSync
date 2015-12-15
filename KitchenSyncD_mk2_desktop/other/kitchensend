@@ -6,4 +6,4 @@ if [ $# -ne 2 ]; then
 	exit 1
 fi
 
-java -jar ~/Projects/KitchenSync/KitchenSyncD_mk2_desktop/kitchensend.jar "$1" "$2"
+java -jar /home/souradip/Projects/KitchenSync/KitchenSyncD_mk2_desktop/kitchensend.jar "$1" "$2"

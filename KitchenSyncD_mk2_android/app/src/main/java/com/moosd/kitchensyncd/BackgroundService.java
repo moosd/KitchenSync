@@ -219,6 +219,20 @@ public class BackgroundService extends Service {
                     }
                 });
 
+
+                net.hooks.addDirectHook(3, new PacketHandler() {
+                    @Override
+                    public void handle(String senderUid, String senderIp,
+                                       int senderPort, byte[] data) {
+                        String dat = new String(data).trim();
+                        System.out.println("[" + senderUid + "] 3 - time to sync - "
+                                + dat);
+                        System.out.println(dat);
+
+                        sync();
+                    }
+                });
+
             } catch (Exception e) {
                 e.printStackTrace();
             }

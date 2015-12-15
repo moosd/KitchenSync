@@ -9,7 +9,7 @@ import javax.swing.*;
 public class Daemon {
     static String oldtext = "";
 
-    static boolean rsyncing = false;
+    public static boolean rsyncing = false;
 
 	/**
 	 * @param args

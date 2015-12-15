@@ -13,8 +13,11 @@ dumpster&
 
 journalctl -u NetworkManager -f | while read lin; do
     if grep ".wlan0.: Activation: successful, device activated." <<<"$lin" > /dev/null; then
-        arping -q -c 3 -U -I wlan0 $(ip addr show wlan0 | grep "inet "| cut -d' ' -f6 | cut -d'/' -f1)
-        fping -g $(ip addr show dev wlan0 | grep "inet " | cut -d' ' -f6) -A -q  &
+        (
+            fping -g $(ip addr show dev wlan0 | grep "inet " | cut -d' ' -f6) -A -q 
+            kitchensend 3 now
+        ) &
+        #arping -q -c 3 -U -I wlan0 $(ip addr show wlan0 | grep "inet "| cut -d' ' -f6 | cut -d'/' -f1)
         dumpster &
     fi
 done
