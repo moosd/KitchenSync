@@ -1,0 +1,8 @@
+[Unit]
+Description=ARP Fixer to ensure reliable kitchensync
+
+[Service]
+ExecStart=/usr/local/bin/arpping_svc.sh
+
+[Install]
+WantedBy=multi-user.target

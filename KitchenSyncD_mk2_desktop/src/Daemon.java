@@ -78,7 +78,7 @@ public class Daemon {
                     if (testTime == (System.currentTimeMillis()/(1000*60))) {
                         try {
                             (new ProcessBuilder(new String[]{"/usr/bin/rsync", "-e", "ssh -p 5120 -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no", "-azv", "--no-perms", "--no-times", "--size-only", "shell@"+senderIp + ":/sdcard/DCIM/Camera/", "/home/souradip/Pictures/Camera/"})).start();
-                            (new ProcessBuilder(new String[]{"/usr/bin/python3", "/home/souradip/Projects/KitchenSyncD_mk2_desktop/sync.py", senderIp})).start();
+                            (new ProcessBuilder(new String[]{"/usr/bin/python3", "/home/souradip/Projects/KitchenSync/KitchenSyncD_mk2_desktop/sync_pim.py", senderIp})).start();
                         } catch (Exception e) {
                             e.printStackTrace();
                         }

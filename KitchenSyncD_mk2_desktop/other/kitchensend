@@ -1,0 +1,9 @@
+#!/bin/bash
+
+if [ $# -ne 2 ]; then
+	echo "Usage:"
+	echo "kitchensend type data"
+	exit 1
+fi
+
+java -jar ~/Projects/KitchenSync/KitchenSyncD_mk2_desktop/kitchensend.jar "$1" "$2"

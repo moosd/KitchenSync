@@ -1,0 +1,1 @@
+/data/nmap/busybox arping -q -c 3 -U -I wlan0 $(ip addr show dev wlan0|grep "inet "|cut -d" " -f6|cut -d"/" -f1)
