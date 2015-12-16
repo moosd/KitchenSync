@@ -11,6 +11,8 @@ tcpdump -enqtli wlan0 arp | while read r; do echo "$r" | egrep -o "who-has(.+) \
 
 dumpster&
 
+python /home/souradip/Projects/KitchenSync/KitchenSyncD_mk2_desktop/other/watch_db.py &
+
 # ensure reliability when we connect by spamming unsolicited arp packets
 
 journalctl -u NetworkManager -f -n 1 | while read lin; do

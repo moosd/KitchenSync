@@ -103,7 +103,9 @@ def addnewobjects(frm, to):
             if to.execute("select count(*) from %s where uri=?" % t, (row[0],)).fetchone()[0] < 1:
                 to.execute("insert into %s (%s) values (%s)" % (t, qstr, qqstr), row)
             else:
-                to.execute("update %s set %s where uri='%s'" % (t, qqqstr, row[0]), row)
+                ts = to.execute("select timestamp from %s where uri=?" % t, (row[0],)).fetchone()[0]
+                if row[1] > ts:
+                    to.execute("update %s set %s where uri='%s'" % (t, qqqstr, row[0]), row)
 
 addnewobjects(db_import, db)
 addnewobjects(db, db_import)
