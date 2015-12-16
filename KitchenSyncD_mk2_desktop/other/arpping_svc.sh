@@ -1,5 +1,7 @@
 #!/bin/bash
 
+pgrep arpping_svc.sh | grep -v $$ && exit 1
+
 # ensure arp reliability whn others connect
 echo 1 > /proc/sys/net/ipv4/conf/all/arp_accept
 
@@ -11,7 +13,7 @@ dumpster&
 
 # ensure reliability when we connect by spamming unsolicited arp packets
 
-journalctl -u NetworkManager -f | while read lin; do
+journalctl -u NetworkManager -f -n 1 | while read lin; do
     if grep ".wlan0.: Activation: successful, device activated." <<<"$lin" > /dev/null; then
         (
             fping -g $(ip addr show dev wlan0 | grep "inet " | cut -d' ' -f6) -A -q 

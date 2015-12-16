@@ -1,0 +1,8 @@
+[Unit]
+Description=Paranoia mac changer
+
+[Service]
+ExecStart=/usr/local/bin/paranoid_svc.sh
+
+[Install]
+WantedBy=multi-user.target
