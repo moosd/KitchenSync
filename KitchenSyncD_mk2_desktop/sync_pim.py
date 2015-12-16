@@ -36,10 +36,11 @@ def rsyncfroms(a, b):
     rsync("shell@%s:%s" % (sys.argv[1], a), b)
 
 def copyback():
-    setsyncprogress()
+#    setsyncprogress()
     rsynctos("db.sqlite.import", "/sdcard/www/baikal/Specific/db/db.sqlite")
     rsynctos("db.sqlite.import.history", "/sdcard/www/baikal/Specific/db/db.sqlite.history")
-    unsetsyncprogress()
+    sshcom("am broadcast -a com.moosd.kitchensyncd.UPDATE_CALENDAR -n com.moosd.kitchensyncd/.CalendarChangeReceiver")
+#    unsetsyncprogress()
 
 # copy our files to a temp place
 dirpath = tempfile.mkdtemp()
