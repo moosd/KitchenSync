@@ -99,7 +99,17 @@ public class BackgroundService extends Service {
                 System.out.println("calendar contacts db event! path="+path+", event ="+event  );
                 if(last < (System.currentTimeMillis() - 5000) && !(new File("/dev/syncinprogress").exists())) {
                     System.out.println("Should sync back to laptop now.");
-                    sync();
+                    // in 5 secs, sync back
+                    /*new Thread() {
+                        @Override
+                        public void run() {
+                            super.run();
+                            try{
+                                Thread.sleep(5000);
+                            } catch(Exception e){e.printStackTrace();}
+                      */      sync();
+                        /*}
+                    }.start()*/;
                 }
                 last = System.currentTimeMillis();
             }

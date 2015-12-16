@@ -103,9 +103,11 @@ def addnewobjects(frm, to):
             if to.execute("select count(*) from %s where uri=?" % t, (row[0],)).fetchone()[0] < 1:
                 to.execute("insert into %s (%s) values (%s)" % (t, qstr, qqstr), row)
             else:
-                ts = to.execute("select timestamp from %s where uri=?" % t, (row[0],)).fetchone()[0]
-                if row[1] > ts:
+                ts = to.execute("select %s from %s where uri=?" % (qstr, t), (row[0],)).fetchone()
+                if row[1] > ts[1]:
                     to.execute("update %s set %s where uri='%s'" % (t, qqqstr, row[0]), row)
+                else:
+                    frm.execute("update %s set %s where uri='%s'" % (t, qqqstr, row[0]), ts)
 
 addnewobjects(db_import, db)
 addnewobjects(db, db_import)
@@ -122,7 +124,7 @@ def syncdeletionshistories(frm, to):
                     frm.execute("update entries set deleted=?, timestamp=? where filename=?", (otherrow[2], otherrow[1], row[0]))
             else:
                 if otherrow[2] == 1:
-                    frm.execute("update entries set deleted=?, timestamp=? where filename=?", (otherrow[2], otherrow[1], row[0]))
+                    frm.execute("update entries set deleted=?, timestamp=? where filename=?", (1, otherrow[1], row[0]))
 
 syncdeletionshistories(db_import_history, db_history)
 syncdeletionshistories(db_history, db_import_history)
