@@ -17,6 +17,15 @@ def hashfile(afile, hasher, blocksize=65536):
         buf = afile.read(blocksize)
     return hasher.digest()
 
+def sshcom(a):
+    call(["ssh", "-p", "5120", "-o", "UserKnownHostsFile=/dev/null", "-o", "StrictHostKeyChecking=no", "shell@%s" % sys.argv[1], a])
+
+def setsyncprogress():
+    sshcom("su -c \"touch /dev/syncinprogress\"")
+
+def unsetsyncprogress():
+    sshcom("su -c \"rm /dev/syncinprogress\"")
+
 def rsync(a, b):
     call(["rsync", "-e", "ssh -p 5120 -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no", "-azvc", a, b])
 
@@ -27,8 +36,10 @@ def rsyncfroms(a, b):
     rsync("shell@%s:%s" % (sys.argv[1], a), b)
 
 def copyback():
+    setsyncprogress()
     rsynctos("db.sqlite.import", "/sdcard/www/baikal/Specific/db/db.sqlite")
     rsynctos("db.sqlite.import.history", "/sdcard/www/baikal/Specific/db/db.sqlite.history")
+    unsetsyncprogress()
 
 # copy our files to a temp place
 dirpath = tempfile.mkdtemp()
@@ -151,6 +162,7 @@ db_import_history.close()
 
 # copy back
 copyback()
+shutil.copy("db.sqlite", "/srv/http/baikal/Specific/db/db.sqlite.backup")
 shutil.copy("db.sqlite", "/srv/http/baikal/Specific/db/db.sqlite")
 shutil.copy("db.sqlite.history", "/srv/http/baikal/Specific/db/db.sqlite.history")
 

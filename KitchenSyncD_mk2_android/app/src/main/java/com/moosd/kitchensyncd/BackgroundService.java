@@ -25,6 +25,7 @@ import com.moosd.kitchensyncd.sync.SyncScheduler;
 
 import org.apache.http.conn.util.InetAddressUtils;
 
+import java.io.File;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.util.Collections;
@@ -78,8 +79,36 @@ public class BackgroundService extends Service {
         }
     }
 
+    public class MyFileObserver2 extends FileObserver {
+        public String absolutePath;
+        long last = 0;
+
+        public MyFileObserver2(String path) {
+            super(path, FileObserver.ALL_EVENTS);
+            absolutePath = path;
+        }
+
+        @Override
+        public void onEvent(int event, String path) {
+            if (path == null) {
+                return;
+            }
+
+
+            if ((FileObserver.MODIFY & event)!=0 && path.equals("db.sqlite")) {
+                System.out.println("calendar contacts db event! path="+path+", event ="+event  );
+                if(last < (System.currentTimeMillis() - 5000) && !(new File("/dev/syncinprogress").exists())) {
+                    System.out.println("Should sync back to laptop now.");
+                    sync();
+                }
+                last = System.currentTimeMillis();
+            }
+        }
+    }
+
     MyContentObserver contentObserver = new MyContentObserver();
     MyFileObserver cameraWatcher = new MyFileObserver("/sdcard/DCIM/Camera/");
+    MyFileObserver2 pimWatcher = new MyFileObserver2("/sdcard/www/baikal/Specific/db/");
 
     public BackgroundService() {
         active = false; wifiLock =null; wakeLock = null; multilock = null;
@@ -164,6 +193,7 @@ public class BackgroundService extends Service {
             ctx = this;
             this.getApplicationContext().getContentResolver().registerContentObserver (ContactsContract.Contacts.CONTENT_URI, true, contentObserver);
             cameraWatcher.startWatching();
+            pimWatcher.startWatching();
 
             System.out.println("Created.");
             try {
