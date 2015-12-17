@@ -97,7 +97,7 @@ public class BackgroundService extends Service {
 
             if ((FileObserver.MODIFY & event)!=0 && path.equals("db.sqlite")) {
                 System.out.println("calendar contacts db event! path="+path+", event ="+event  );
-                if(last < (System.currentTimeMillis() - 5000) && !(new File("/dev/syncinprogress").exists())) {
+                if(last < (System.currentTimeMillis() - 5000)/* && !(new File("/dev/syncinprogress").exists())*/) {
                     System.out.println("Should sync back to laptop now.");
                     // in 5 secs, sync back
                     /*new Thread() {

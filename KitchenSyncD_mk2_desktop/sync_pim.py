@@ -8,6 +8,7 @@ import sqlite3
 import hashlib
 from pid import PidFile
 import socket
+import time
 
 # functions
 def hashfile(afile, hasher, blocksize=65536):
@@ -37,8 +38,8 @@ def rsyncfroms(a, b):
 
 def copyback():
 #    setsyncprogress()
-    rsynctos("db.sqlite.import", "/sdcard/www/baikal/Specific/db/db.sqlite")
-    rsynctos("db.sqlite.import.history", "/sdcard/www/baikal/Specific/db/db.sqlite.history")
+    rsynctos("import/", "/sdcard/www/baikal/Specific/db/")
+#    rsynctos("db.sqlite.import.history", "/sdcard/www/baikal/Specific/db/db.sqlite.history")
     sshcom("am broadcast -a com.moosd.kitchensyncd.UPDATE_CALENDAR -n com.moosd.kitchensyncd/.CalendarChangeReceiver")
 #    unsetsyncprogress()
 
@@ -53,10 +54,12 @@ def updatehistory(file, file_hist):
             else:
                 file_hist.execute("update entries set timestamp=?, deleted=0 where tab=? and filename=?", (row[1], t, row[0]))
     # go through history, if not present in main db, mark as deleted
-    cursor = file_hist.execute("select tab, filename from entries")
+    cursor = file_hist.execute("select tab, filename from entries where deleted=0")
     for row in cursor:
+#        print("test %s/%s" % (row[0], row[1]))
         if file.execute("select count(*) from %s where uri=?" % row[0], (row[1],)).fetchone()[0] < 1:
             file_hist.execute("update entries set deleted=1 where tab=? and filename=?", (row[0], row[1]))
+#            print("deleted %s/%s" % (row[0], row[1]))
     pass
 
 def addnewobjects(frm, to):
@@ -100,7 +103,7 @@ def ctagupdate(file, file2):
             f = file2.execute("select ctag from %s where id=?" % t, (row[0],)).fetchone()
             if f is not None:
                 ctag = f[0]
-                if row[1] is not ctag:
+                if row[1] != ctag:
                     ctag = ctag + 1
                     file.execute("update %s set ctag=? where id=?" % t, (ctag, row[0]))
                     file2.execute("update %s set ctag=? where id=?" % t, (ctag, row[0]))
@@ -114,28 +117,49 @@ columns = { "calendarobjects": ["uri", "lastmodified", "calendardata", "calendar
 with PidFile(piddir='/tmp'):
     dirpath = tempfile.mkdtemp()
     curdir = os.getcwd()
+    os.chdir(dirpath)
+
+    os.mkdir("import")
     shutil.copy("/srv/http/baikal/Specific/db/db.sqlite", dirpath)
     shutil.copy("/srv/http/baikal/Specific/db/db.sqlite.history", dirpath)
 
     # copy their files to a temp place
-    os.chdir(dirpath)
-    shutil.copy("db.sqlite", "db.sqlite.import")
-    shutil.copy("db.sqlite.history", "db.sqlite.import.history")
-    rsyncfroms("/sdcard/www/baikal/Specific/db/db.sqlite", "db.sqlite.import")
-    rsyncfroms("/sdcard/www/baikal/Specific/db/db.sqlite.history", "db.sqlite.import.history")
+    shutil.copy("db.sqlite", "import/db.sqlite")
+    shutil.copy("db.sqlite.history", "import/db.sqlite.history")
+    rsyncfroms("/sdcard/www/baikal/Specific/db/", "import/")
+#    print(dirpath)
+#    time.sleep(300)
+#    sys.exit(0)
+#    rsyncfroms("/sdcard/www/baikal/Specific/db/db.sqlite.history", "db.sqlite.import.history")
 
-    # if hashes are equal, copy back and exit...
-    filea, fileb = (hashfile(open('db.sqlite', 'rb'), hashlib.sha256()), hashfile(open('db.sqlite.import', 'rb'), hashlib.sha256()))
-    if filea == fileb:
-        copyback()
-        shutil.rmtree(dirpath)
-        sys.exit(0)
-
-    # do sync...
+    # open databases
     db = sqlite3.connect('db.sqlite')
     db_history = sqlite3.connect('db.sqlite.history')
-    db_import = sqlite3.connect('db.sqlite.import')
-    db_import_history = sqlite3.connect('db.sqlite.import.history')
+    db_import = sqlite3.connect('import/db.sqlite')
+    db_import_history = sqlite3.connect('import/db.sqlite.history')
+
+    # if ctags are equal, do nothing...
+    diff = 0
+    for t in ctagtables:
+        cursor = db.execute("select id, ctag from %s" % t)
+        for row in cursor:
+            f = db_import.execute("select ctag from %s where id=?" % t, (row[0],)).fetchone()
+            if f is not None:
+                ctag = f[0]
+                if row[1] != ctag:
+                    diff = 1
+                    #print((row[1], ctag))
+
+    if diff == 0:
+        #copyback()
+        db.close()
+        db_history.close()
+        db_import.close()
+        db_import_history.close()
+
+        os.chdir(curdir)
+        shutil.rmtree(dirpath)
+        sys.exit(0)
 
     # first, update histories for both
     updatehistory(db, db_history)
@@ -155,6 +179,10 @@ with PidFile(piddir='/tmp'):
     # update ctags if not equal
     ctagupdate(db, db_import)
     #ctagupdate(db_import, db)
+
+    # update histories once again
+    updatehistory(db, db_history)
+    updatehistory(db_import, db_import_history)
 
     db.commit()
     db_import.commit()
@@ -185,4 +213,5 @@ with PidFile(piddir='/tmp'):
 
     # clean up
     #print(dirpath)
+    os.chdir(curdir)
     shutil.rmtree(dirpath)
