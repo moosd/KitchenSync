@@ -87,6 +87,8 @@ public class Daemon {
                 }
             });
 
+            // start sms program server
+
            /* new Thread() {
                 @Override
                 public void run() {
