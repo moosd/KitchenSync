@@ -204,7 +204,7 @@ public class BackgroundService extends Service {
             this.getApplicationContext().getContentResolver().registerContentObserver (ContactsContract.Contacts.CONTENT_URI, true, contentObserver);
             cameraWatcher.startWatching();
             // disabled instant syncing because may want to add more events later. Will sync on next connection.
-            //pimWatcher.startWatching();
+            pimWatcher.startWatching();
 
             System.out.println("Created.");
             try {
