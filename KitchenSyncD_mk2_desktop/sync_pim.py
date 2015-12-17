@@ -7,6 +7,7 @@ import shutil
 import sqlite3
 import hashlib
 from pid import PidFile
+import socket
 
 # functions
 def hashfile(afile, hasher, blocksize=65536):
@@ -172,7 +173,15 @@ with PidFile(piddir='/tmp'):
     shutil.copy("db.sqlite.history", "/srv/http/baikal/Specific/db/db.sqlite.history")
 
     # notify thunderbird
-
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.connect(("localhost", 3000))
+        s.send("refresh\r\n".encode("utf-8"))
+        data = s.recv(64)
+        s.close()
+    except e:
+        print("exception notifying thunderbird...")
+        print(e)
 
     # clean up
     #print(dirpath)
