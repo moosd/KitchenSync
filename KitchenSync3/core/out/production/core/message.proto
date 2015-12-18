@@ -1,0 +1,23 @@
+package message;
+
+option java_package = "com.moosd.kitchensync";
+option java_outer_classname = "Message";
+
+message Packet {
+  required int32 id = 1;
+
+  message EchoPacket {
+    required string text = 1;
+  }
+  message BrowserPacket {
+    enum UriType {
+        URL = 0;
+        TELEPHONE = 1;
+    }
+    required UriType type = 1;
+    required string uri = 2;
+  }
+
+  repeated EchoPacket ep = 2;
+  repeated BrowserPacket bp = 3;
+}

@@ -1,0 +1,18 @@
+<component name="libraryTable">
+  <library name="org.zalando.stups:crypto-keyczar:0.9.0" type="repository">
+    <properties maven-id="org.zalando.stups:crypto-keyczar:0.9.0" />
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/zalando/stups/crypto-keyczar/0.9.0/crypto-keyczar-0.9.0.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/org/zalando/stups/crypto-common/0.9.0/crypto-common-0.9.0.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/org/slf4j/slf4j-api/1.7.12/slf4j-api-1.7.12.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/com/google/guava/guava/18.0/guava-18.0.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/org/zalando/stups/keyczar-repack/0.71g-090613-1/keyczar-repack-0.71g-090613-1.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/log4j/log4j/1.2.17/log4j-1.2.17.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/com/google/code/gson/gson/2.4/gson-2.4.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/org/zalando/stups/crypto-keyczar/0.9.0/crypto-keyczar-0.9.0-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES />
+  </library>
+</component>
