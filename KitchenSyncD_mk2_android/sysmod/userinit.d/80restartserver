@@ -1,0 +1,6 @@
+#!/system/xbin/bash
+
+while true; do
+    /data/data/com.andi.serverweb/files/lighttpd/lighttpd -f /data/data/com.andi.serverweb/files/lighttpd/lighttpd.conf -D
+done
+

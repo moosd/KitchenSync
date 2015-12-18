@@ -19,13 +19,12 @@ public class WifiReceiver extends BroadcastReceiver {
     }
 
     @Override
-    public void onReceive(Context context, Intent intent) {
+    public void onReceive(final Context context, Intent intent) {
         if (isConnectedViaWifi(context)) {
             try {
-                Thread.sleep(5000);
+                Thread.sleep(2000);
                 // announce presence and update everyone's arp cache
                 Command command = new Command(0, "/data/nmap/busybox arping -q -c 3 -U -I wlan0 $(ip addr show dev wlan0|grep 'inet '|cut -d' ' -f6|cut -d'/' -f1)") {
-                    boolean dostuff = false;
                     @Override
                     public void commandOutput(int id, String line) {
                         super.commandOutput(id, line);
@@ -34,25 +33,29 @@ public class WifiReceiver extends BroadcastReceiver {
                     @Override
                     public void commandTerminated(int id, String reason) {
                         super.commandTerminated(id, reason);
-                        if(!dostuff) {
-                            dostuff = true;
-                            Intent pushIntent = new Intent(context, BackgroundService.class);
-                            context.startService(pushIntent);
+                        synchronized (WifiReceiver.this) {
+                            WifiReceiver.this.notify();
                         }
                     }
 
                     @Override
                     public void commandCompleted(int id, int exitcode) {
                         super.commandCompleted(id, exitcode);
-                        if(!dostuff) {
-                            dostuff = true;
-                            Intent pushIntent = new Intent(context, BackgroundService.class);
-                            context.startService(pushIntent);
+                        synchronized (WifiReceiver.this) {
+                            WifiReceiver.this.notify();
                         }
                     }
                 };
                 RootTools.getShell(true).add(command);
+                synchronized (this) {
+                    wait(2000);
+                }
+                System.out.println("Finished wait");
+
+                Intent pushIntent = new Intent(context, BackgroundService.class);
+                context.startService(pushIntent);
             } catch (Exception e) {
+                e.printStackTrace();
             }
         }
     }
