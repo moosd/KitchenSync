@@ -2,6 +2,10 @@ import com.moosd.kitchensyncd.networking.Networking;
 import com.moosd.kitchensyncd.networking.PacketHandler;
 import com.moosd.kitchensyncd.sync.OneWaySync;
 import com.moosd.kitchensyncd.sync.SyncScheduler;
+import net.sf.jcarrierpigeon.WindowPosition;
+import net.sf.jtelegraph.Telegraph;
+import net.sf.jtelegraph.TelegraphQueue;
+import net.sf.jtelegraph.TelegraphType;
 
 import javax.swing.*;
 
@@ -21,6 +25,8 @@ public class Daemon {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		} catch (Exception ex) {
 		}
+
+            final TelegraphQueue q = new TelegraphQueue();
             rsyncing = false;
 			
 			final Networking net = new Networking("TESTEST123", 10000);
@@ -43,7 +49,7 @@ public class Daemon {
                 }
             });
 
-            // Notification
+            // ExampleFrame
             net.hooks.addDirectHook(4, new PacketHandler() {
                 @Override
                 public void handle(String senderUid, String senderIp,
@@ -53,11 +59,19 @@ public class Daemon {
                         oldtext = dat;
                         try {
                             String[] d = dat.split("\\n");
-                            if (d.length == 1)
-                                (new ProcessBuilder(new String[]{"/usr/bin/notify-send", d[0]})).start();
-                            else {
-                                if(!d[1].equals("Incoming call"))
-                                    (new ProcessBuilder(new String[]{"/usr/bin/notify-send", d[0], dat.substring(d[0].length())})).start();
+                            if (d.length == 1) {
+                                //(new ProcessBuilder(new String[]{"/usr/bin/notify-send", d[0]})).start();
+                                Telegraph tele = new Telegraph("", d[0], TelegraphType.NOTIFICATION_INFO, WindowPosition.BOTTOMRIGHT, 1000);
+                                q.add(tele);
+                                System.out.println("n: "+ d[0]);
+                            } else {
+                                if(!d[1].equals("Incoming call")) {
+                                    //(new ProcessBuilder(new String[]{"/usr/bin/notify-send", d[0], dat.substring(d[0].length())})).start();
+                                    Telegraph tele = new Telegraph(d[0], dat.substring(d[0].length()), TelegraphType.NOTIFICATION_ADD, WindowPosition.BOTTOMRIGHT, 1000);
+                                    q.add(tele);
+                                    System.out.println("N: "+d[0]+ " - " + dat.substring(d[0].length()));
+                                }
+
                             }
                         } catch (Exception e) {
                             e.printStackTrace();
@@ -78,6 +92,8 @@ public class Daemon {
                     if (testTime == (System.currentTimeMillis()/(1000*60))) {
                         try {
                             (new ProcessBuilder(new String[]{"/usr/bin/rsync", "-e", "ssh -p 5120 -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no", "-azv", "--no-perms", "--no-times", "--size-only", "shell@"+senderIp + ":/sdcard/DCIM/Camera/", "/home/souradip/Pictures/Camera/"})).start();
+                            (new ProcessBuilder(new String[]{"/usr/bin/rsync", "-e", "ssh -p 5120 -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no", "-azv", "--no-perms", "--no-times", "--size-only", "shell@"+senderIp + ":/sdcard/Android/data/com.mendhak.gpslogger/files/", "/home/souradip/My Tracks"})).start();
+                            (new ProcessBuilder(new String[]{"/usr/bin/rsync", "-e", "ssh -p 5120 -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no", "-azv", "--no-perms", "--no-times", "--size-only", "/home/souradip/.keypass.db.kdb", "shell@"+senderIp + ":/sdcard/keypass.db.kdb"})).start();
                             (new ProcessBuilder(new String[]{"/usr/bin/python3", "/home/souradip/Projects/KitchenSync/KitchenSyncD_mk2_desktop/sync_pim.py", senderIp})).start();
                         } catch (Exception e) {
                             e.printStackTrace();

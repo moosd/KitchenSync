@@ -10,6 +10,9 @@
       <element id="extracted-dir" path="$PROJECT_DIR$/../KitchenSync-common/libs/commons-lang3-3.3.1.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/../KitchenSync-common/kitchensync-common.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/../KitchenSync-common/libs/commons-codec-1.9.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/libs/JCarrierPigeon-1.3.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/libs/JTelegraph-1.0.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/libs/timingframework-classic-1.1.jar" path-in-jar="/" />
     </root>
   </artifact>
 </component>

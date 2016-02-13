@@ -6,11 +6,11 @@ pgrep arpping_svc.sh | grep -v $$ && exit 1
 echo 1 > /proc/sys/net/ipv4/conf/all/arp_accept
 
 function dumpster(){
-    tcpdump -enqtli wlan0 arp | while read r; do echo "$r" | egrep -o "who-has(.+) \\(" && ping -c 1 -W 1.5 $(echo "$r" | egrep -o "who-has(.+) \\(" | cut -d' ' -f2); done
+    pgrep tcpdump || tcpdump -enqtli wlan0 arp | while read r; do echo "$r" | egrep -o "who-has(.+) \\(" && ping -c 1 -W 1.5 $(echo "$r" | egrep -o "who-has(.+) \\(" | cut -d' ' -f2); done
 }
 
 function pingitall(){
-    fping -g $(ip addr show dev wlan0 | grep "inet " | cut -d' ' -f6) -A -q 
+    pgrep fping || fping -g $(ip addr show dev wlan0 | grep "inet " | cut -d' ' -f6) -A -q 
     kitchensend 3 now
 }
 
