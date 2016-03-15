@@ -25,23 +25,35 @@ public class NotificationListener extends NotificationListenerService {
         super.onDestroy();
     }
 
+    public String[] lastWhatsapp = {"", ""};
+
     @Override
     public void onNotificationPosted(final StatusBarNotification sbn) {
         boolean present = false;
-        String test = sbn.getPackageName();
+        final String test = sbn.getPackageName();
         Bundle extras = sbn.getNotification().extras;
         final String title = extras.getString("android.title");
         final String text = extras.getCharSequence("android.text").toString();
+        final boolean whatsapp = (text.contains(" messages from ") && title.equals("WhatsApp"));
 
         for (String a : ignoredNotifications) {
             if(a.equals(test))
                 present = true;
         }
+
+        if(test.equals("com.whatsapp") && !whatsapp){
+                lastWhatsapp = new String[]{title, text};
+                present = true;
+        }
+
         if (!present) {
             new Thread(){
                 @Override
                 public void run() {
-                    BackgroundService.net.directSend.dump(10000, 4, (title + "\n" + text).getBytes());
+                    String[] say = {title, text};
+                    if(whatsapp)
+                        say = lastWhatsapp;
+                    BackgroundService.net.directSend.dump(10000, 4, (say[0] + "\n" + say[1]).getBytes());
                 }
             }.start();
         }
